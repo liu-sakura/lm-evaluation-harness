@@ -55,6 +55,7 @@ class HFLM(TemplateLM):
     def __init__(
         self,
         pretrained: Union[str, transformers.PreTrainedModel],
+        model_name_or_path: Optional[str] = None,
         backend: Optional[Literal["default", "causal", "seq2seq"]] = "default",
         # override whether the model should be treated as decoder-only (causal) or encoder-decoder (seq2seq)
         revision: Optional[str] = "main",
@@ -90,7 +91,9 @@ class HFLM(TemplateLM):
         **kwargs,
     ) -> None:
         super().__init__()
-
+        
+        self.model_name_or_path = model_name_or_path
+        
         # optionally: take in an already-initialized transformers.PreTrainedModel
         if not isinstance(pretrained, str):
             eval_logger.warning(
@@ -1442,7 +1445,7 @@ class HFLM(TemplateLM):
             "model_num_parameters": get_model_num_params(self._model),
             "model_dtype": get_model_dtype(self._model),
             "model_revision": self.revision,
-            "model_sha": get_model_sha(self.pretrained, self.revision),
+            "model_sha": get_model_sha(self.model_name_or_path, self.revision),
         }
         if self.peft:
             model_info["peft_sha"] = get_model_sha(self.peft, self.revision)
